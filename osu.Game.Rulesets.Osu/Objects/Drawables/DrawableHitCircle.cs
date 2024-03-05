@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public class DrawableHitCircle : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
         public ApproachCircle ApproachCircle { get; }
+        private bool validKeyPressed;
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
@@ -35,6 +36,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public DrawableHitCircle(HitCircle h)
             : base(h)
         {
+            validKeyPressed = true;
             Origin = Anchor.Centre;
 
             Position = HitObject.StackedPosition;
@@ -50,10 +52,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     {
                         hitArea = new HitArea
                         {
-                            Hit = () =>
+                            Hit = (action) =>
                             {
                                 if (AllJudged)
                                     return false;
+
+                                validKeyPressed = Array.IndexOf(HitObject.HitActions, action)!=-1;
 
                                 UpdateResult(true);
                                 return true;
@@ -125,6 +129,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Shake(Math.Abs(timeOffset) - HitObject.HitWindows.WindowFor(HitResult.Miss));
                 return;
             }
+            if (!validKeyPressed)
+                result = HitResult.Miss;
 
             ApplyResult(r => r.Type = result);
         }
@@ -177,7 +183,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // IsHovered is used
             public override bool HandlePositionalInput => true;
 
-            public Func<bool> Hit;
+            public Func<OsuAction, bool> Hit;
 
             public OsuAction? HitAction;
 
@@ -195,7 +201,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 {
                     case OsuAction.LeftButton:
                     case OsuAction.RightButton:
-                        if (IsHovered && (Hit?.Invoke() ?? false))
+                        if (IsHovered && (Hit?.Invoke(action) ?? false))
                         {
                             HitAction = action;
                             return true;

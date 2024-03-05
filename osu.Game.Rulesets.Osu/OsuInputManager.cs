@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu
             => new OsuKeyBindingContainer(ruleset, variant, unique);
 
         public OsuInputManager(RulesetInfo ruleset)
-            : base(ruleset, 0, SimultaneousBindingMode.Unique)
+            : base(ruleset, 0, SimultaneousBindingMode.All)
         {
         }
 

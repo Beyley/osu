@@ -14,6 +14,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition
     {
+        public OsuAction[] HitActions = new OsuAction[] { OsuAction.LeftButton, OsuAction.RightButton };
+
         public const float OBJECT_RADIUS = 64;
 
         public double TimePreempt = 600;
